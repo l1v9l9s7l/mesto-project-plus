@@ -1,4 +1,4 @@
-import {NOT_FOUND} from '../utils/errors';
+import { NOT_FOUND } from '../utils/errors';
 
 export default class NotFoundError extends Error {
   private statusCode: number;

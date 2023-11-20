@@ -1,5 +1,5 @@
-import mongoose from "mongoose"
-import { Request } from "express"
+import mongoose from 'mongoose';
+import { Request } from 'express';
 
 export type TUser = {
   name: string,

@@ -1,23 +1,23 @@
-import mongoose from "mongoose";
-import { TUser } from "utils/types";
+import mongoose from 'mongoose';
+import { TUser } from '../utils/types';
 
 const userSchema = new mongoose.Schema<TUser>({
-  name:{
+  name: {
     type: String,
     required: true,
     minLength: 2,
-    maxLength: 30
+    maxLength: 30,
   },
-  about:{
+  about: {
     type: String,
     required: true,
     minLength: 2,
-    maxLength: 200
+    maxLength: 200,
   },
-  avatar:{
+  avatar: {
     type: String,
-    required: true
-  }
-})
+    required: true,
+  },
+});
 
-export default mongoose.model('User', userSchema)
+export default mongoose.model('User', userSchema);

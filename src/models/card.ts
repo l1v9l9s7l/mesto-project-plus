@@ -1,32 +1,32 @@
-import mongoose from "mongoose";
-import { TCard } from "utils/types";
+import mongoose from 'mongoose';
+import { TCard } from '../utils/types';
 
 const cardSchema = new mongoose.Schema<TCard>({
-  name:{
+  name: {
     type: String,
     required: true,
     minLength: 2,
-    maxLength: 30
+    maxLength: 30,
   },
-  link:{
+  link: {
     type: String,
-    required: true
+    required: true,
   },
-  owner:{
+  owner: {
     type: mongoose.Schema.Types.ObjectId,
-    required: true
+    required: true,
   },
-  likes:{
-  type:[{
-    type: mongoose.Schema.Types.ObjectId,
-  }],
-  required: true,
-  default: []
+  likes: {
+    type: [{
+      type: mongoose.Schema.Types.ObjectId,
+    }],
+    required: true,
+    default: [],
   },
-  createdAt:{
+  createdAt: {
     type: Date,
-    default: Date.now()
-  }
-})
+    default: Date.now(),
+  },
+});
 
-export default mongoose.model('Card', cardSchema)
+export default mongoose.model('Card', cardSchema);

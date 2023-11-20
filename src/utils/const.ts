@@ -1,10 +1,10 @@
-export const DEFAULT_DB_URL = 'mongodb://localhost:27017/mestodb' //Адрес подключения к БД
+export const DEFAULT_DB_URL = 'mongodb://localhost:27017/mestodb'; // Адрес подключения к БД
 
-//Ошибки
+// Ошибки
 export const VALIDATION_ERROR = 'ValidationError';
 export const CAST_ERROR = 'CastError';
 
-//Описание ошибок
+// Описание ошибок
 export const USER_ERR_NAME = 'Имя пользователя должно быть от 2 до 30 символов';
 export const USER_ERR_ABOUT = 'Описание должно быть от 2 до 200 символов';
 export const USER_ERR_EMAIL_EMPTY = 'E-mail должен быть введен';
