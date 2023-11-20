@@ -2,14 +2,14 @@ import { NextFunction, Request, Response } from 'express';
 import { ICardRequest } from '../utils/types';
 import Card from '../models/card';
 import { VALIDATION_ERROR, CAST_ERROR } from '../utils/const';
-import { BAD_REQUEST, NOT_FOUND } from '../utils/errors';
+import { BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER_ERROR } from '../utils/errors';
 import BadRequestError from '../errors/BadRequestError';
 import NotFoundError from '../errors/NotFoundError';
 
 // Нашли все карточки по схеме Card
 export const getCards = (req: Request, res: Response, next: NextFunction) => Card.find({})
   .then((cards) => { res.status(200).send({ data: cards }); }) // Отправляем данные карточек
-  .catch(next); // Переходим к следующему мидлвару при ошибке
+  .catch(() => res.status(INTERNAL_SERVER_ERROR.code).send({ message: INTERNAL_SERVER_ERROR.message }));
 
 export const createCard = (req: Request, res: Response, next: NextFunction) => {
   Card.create({
@@ -19,12 +19,12 @@ export const createCard = (req: Request, res: Response, next: NextFunction) => {
     .then((card) => res.status(201).send(card))
     .catch((err) => {
       if (err.name === VALIDATION_ERROR) {
-        next(new BadRequestError(BAD_REQUEST.message.cardCreate));
-      } else {
-        next(err);
+        return res.status(BAD_REQUEST.code).send({ message: BAD_REQUEST.message.cardCreate });
       }
+      return res.status(INTERNAL_SERVER_ERROR.code).send({ message: INTERNAL_SERVER_ERROR.message });
     });
 };
+
 
 export const deleteCard = (req: Request, res: Response, next: NextFunction) => {
   Card.findByIdAndRemove(req.params.cardId)
@@ -34,13 +34,7 @@ export const deleteCard = (req: Request, res: Response, next: NextFunction) => {
       }
     })
     .then((card) => res.send({ data: card }))
-    .catch((err) => {
-      if (err.name === CAST_ERROR) {
-        next(new BadRequestError(err.message));
-      } else {
-        next(err);
-      }
-    });
+    .catch(() => res.status(INTERNAL_SERVER_ERROR.code).send({ message: INTERNAL_SERVER_ERROR.message }));
 };
 
 export const putCardLike = (req: ICardRequest, res: Response) => {
@@ -61,7 +55,7 @@ export const putCardLike = (req: ICardRequest, res: Response) => {
         res.status(200).send({ data: card });
       }
     })
-    .catch((err) => res.status(500).send(err));
+    .catch(() => res.status(INTERNAL_SERVER_ERROR.code).send({ message: INTERNAL_SERVER_ERROR.message }));
 };
 
 export const deleteCardLike = (req: ICardRequest, res: Response, next: NextFunction) => {
@@ -84,9 +78,8 @@ export const deleteCardLike = (req: ICardRequest, res: Response, next: NextFunct
     })
     .catch((err) => {
       if (err.name === CAST_ERROR) {
-        next(new BadRequestError(BAD_REQUEST.message.actionLikeCard));
-      } else {
-        next(err);
+        return res.status(BAD_REQUEST.code).send({ message: BAD_REQUEST.message.actionLikeCard });
       }
+      return res.status(INTERNAL_SERVER_ERROR.code).send({ message: INTERNAL_SERVER_ERROR.message });
     });
 };
