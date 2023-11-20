@@ -2,10 +2,9 @@ import { NextFunction, Request, Response } from 'express';
 import { ICardRequest } from '../utils/types';
 import Card from '../models/card';
 import { VALIDATION_ERROR, CAST_ERROR } from '../utils/const';
-import { BAD_REQUEST, NOT_FOUND, FORBIDDEN } from '../utils/errors';
+import { BAD_REQUEST, NOT_FOUND } from '../utils/errors';
 import BadRequestError from '../errors/BadRequestError';
 import NotFoundError from '../errors/NotFoundError';
-import ForbiddenError from '../errors/ForbiddenError';
 
 // Нашли все карточки по схеме Card
 export const getCards = (req: Request, res: Response, next: NextFunction) => Card.find({})
@@ -28,16 +27,11 @@ export const createCard = (req: Request, res: Response, next: NextFunction) => {
 };
 
 export const deleteCard = (req: Request, res: Response, next: NextFunction) => {
-  const id = req.params.cardId;
-  Card.findByIdAndRemove(req.params.id)
+  Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
       if (!card) {
         throw new NotFoundError(NOT_FOUND.message.cardDelete);
       }
-      if (card.owner.toString() !== id) {
-        throw new ForbiddenError(FORBIDDEN.message.card);
-      }
-      return Card.findByIdAndDelete(id);
     })
     .then((card) => res.send({ data: card }))
     .catch((err) => {
@@ -50,7 +44,7 @@ export const deleteCard = (req: Request, res: Response, next: NextFunction) => {
 };
 
 export const putCardLike = (req: ICardRequest, res: Response) => {
-  const id = req.params;
+  const id = req.params.cardId;
   const owner = req.user?._id;
   Card.findByIdAndUpdate(
     id,
@@ -71,7 +65,7 @@ export const putCardLike = (req: ICardRequest, res: Response) => {
 };
 
 export const deleteCardLike = (req: ICardRequest, res: Response, next: NextFunction) => {
-  const id = req.params;
+  const id = req.params.cardId;
   const owner = req.user?._id;
   Card.findByIdAndUpdate(
     id,

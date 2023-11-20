@@ -29,7 +29,7 @@ app.get('/users/:userId', getUsers); // Роут получения пользо
 app.post('/users', createUser); // Роут создания пользователя
 app.get('/cards', getCards); // Роут получения карточек
 app.post('/cards', createCard); // Роут создания карточки
-app.delete('/cards:cardId', deleteCard); // Роут удаления карточки по идентификатору
+app.delete('/cards/:cardId', deleteCard); // Роут удаления карточки по идентификатору
 app.patch('/users/me', updateUser); // Роут обновления профиля
 app.patch('/users/me/avatar', updateUserAvatar); // Роут обновления аватара
 app.put('/cards/:cardId/likes', putCardLike); // Роут добавления лайка карточки
