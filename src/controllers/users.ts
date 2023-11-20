@@ -1,19 +1,19 @@
-import { NextFunction, Request, Response } from 'express';
+import { Request, Response } from 'express';
 import { IUserRequest } from '../utils/types';
 import User from '../models/user';
-import { VALIDATION_ERROR, CAST_ERROR } from '../utils/const';
-import { BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER_ERROR, CREATED, DONE} from '../utils/errors';
-import BadRequestError from '../errors/BadRequestError';
+import { VALIDATION_ERROR } from '../utils/const';
+import {
+  BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER_ERROR, CREATED, DONE,
+} from '../utils/errors';
 import NotFoundError from '../errors/NotFoundError';
 
-// import bcrypt from 'bcryptjs';
-
 // Нашли всех пользователей по схеме User
-export const getUsers = (req: Request, res: Response, next: NextFunction) => User.find({})
+export const getUsers = (req: Request, res: Response) => User.find({})
   .then((users) => { res.status(200).send({ data: users }); }) // Отправляем данные пользователей
-  .catch(() => res.status(INTERNAL_SERVER_ERROR.code).send({ message: INTERNAL_SERVER_ERROR.message }));
+  .catch(() => res.status(INTERNAL_SERVER_ERROR.code)
+    .send({ message: INTERNAL_SERVER_ERROR.message }));
 
-export const getUserById = (req: IUserRequest, res: Response, next: NextFunction) => {
+export const getUserById = (req: IUserRequest, res: Response) => {
   const id = req.user?._id;
   return User.findById(id)
     .then((user) => {
@@ -22,10 +22,11 @@ export const getUserById = (req: IUserRequest, res: Response, next: NextFunction
       }
       res.send(user);
     })
-    .catch(() =>  res.status(INTERNAL_SERVER_ERROR.code).send({ message: INTERNAL_SERVER_ERROR.message }));
+    .catch(() => res.status(INTERNAL_SERVER_ERROR.code)
+      .send({ message: INTERNAL_SERVER_ERROR.message }));
 };
 
-export const createUser = (req: Request, res: Response, next: NextFunction) => {
+export const createUser = (req: Request, res: Response) => {
   User.create({
     name: req.body.name,
     about: req.body.about,
@@ -36,11 +37,12 @@ export const createUser = (req: Request, res: Response, next: NextFunction) => {
       if (err.name === VALIDATION_ERROR) {
         return res.status(BAD_REQUEST.code).send({ message: BAD_REQUEST.message.userCreate });
       }
-      return res.status(INTERNAL_SERVER_ERROR.code).send({ message: INTERNAL_SERVER_ERROR.message });
+      return res.status(INTERNAL_SERVER_ERROR.code)
+        .send({ message: INTERNAL_SERVER_ERROR.message });
     });
 };
 
-export const updateUser = (req: IUserRequest, res: Response, next: NextFunction) => {
+export const updateUser = (req: IUserRequest, res: Response) => {
   User.findByIdAndUpdate(req.user?._id, { name: req.body.name, about: req.body.about })
     .orFail(() => new NotFoundError(NOT_FOUND.message.getUser))
     .then((user) => res.status(CREATED.code).send(user))
@@ -54,11 +56,12 @@ export const updateUser = (req: IUserRequest, res: Response, next: NextFunction)
       if (err.name === VALIDATION_ERROR) {
         return res.status(BAD_REQUEST.code).send({ message: BAD_REQUEST.message.userUpdate });
       }
-      return res.status(INTERNAL_SERVER_ERROR.code).send({ message: INTERNAL_SERVER_ERROR.message });
+      return res.status(INTERNAL_SERVER_ERROR.code)
+        .send({ message: INTERNAL_SERVER_ERROR.message });
     });
 };
 
-export const updateUserAvatar = (req: IUserRequest, res: Response, next: NextFunction) => {
+export const updateUserAvatar = (req: IUserRequest, res: Response) => {
   User.findByIdAndUpdate(req.user?._id, { avatar: req.body.avatar })
     .orFail(() => new NotFoundError(NOT_FOUND.message.getUser))
     .then((user) => res.status(201).send(user))
@@ -70,8 +73,9 @@ export const updateUserAvatar = (req: IUserRequest, res: Response, next: NextFun
     })
     .catch((err) => {
       if (err.name === VALIDATION_ERROR) {
-        return res.status(BAD_REQUEST.code).send({ message: BAD_REQUEST.message.avatarUpdate })
+        return res.status(BAD_REQUEST.code).send({ message: BAD_REQUEST.message.avatarUpdate });
       }
-      return res.status(INTERNAL_SERVER_ERROR.code).send({ message: INTERNAL_SERVER_ERROR.message });
+      return res.status(INTERNAL_SERVER_ERROR.code)
+        .send({ message: INTERNAL_SERVER_ERROR.message });
     });
 };
