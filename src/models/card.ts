@@ -12,21 +12,20 @@ const cardSchema = new mongoose.Schema<TCard>({
     type: String,
     required: true,
   },
-  // owner: {
-  //   type: mongoose.Schema.Types.ObjectId,
-  //   required: true,
-  // },
+  owner: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'user',
+    required: true,
+  },
   likes: {
-    type: [{
-      type: mongoose.Schema.Types.ObjectId,
-    }],
+    type: [{ type: mongoose.Schema.Types.ObjectId, ref: 'user' }],
     required: true,
     default: [],
   },
-  // createdAt: {
-  //   type: Date,
-  //   default: Date.now(),
-  // },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
 });
 
-export default mongoose.model('Card', cardSchema);
+export default mongoose.model('card', cardSchema);

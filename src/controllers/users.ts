@@ -5,22 +5,21 @@ import { VALIDATION_ERROR } from '../utils/const';
 import {
   BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER_ERROR, CREATED, DONE,
 } from '../utils/errors';
-import NotFoundError from '../errors/NotFoundError';
 
 // Нашли всех пользователей по схеме User
 export const getUsers = (req: Request, res: Response) => User.find({})
-  .then((users) => { res.status(200).send({ data: users }); }) // Отправляем данные пользователей
+  .then((users) => { res.status(DONE.code).send({ data: users }); }) // Отправляем данные польз-ей
   .catch(() => res.status(INTERNAL_SERVER_ERROR.code)
     .send({ message: INTERNAL_SERVER_ERROR.message }));
 
 export const getUserById = (req: IUserRequest, res: Response) => {
-  const id = req.user?._id;
+  const { id } = req.params;
   return User.findById(id)
     .then((user) => {
-      if (!user) {
-        throw new NotFoundError(NOT_FOUND.message.getUser);
+      if (user) {
+        res.status(DONE.code).send(user);
       }
-      res.send(user);
+      return res.status(NOT_FOUND.code).send({ message: NOT_FOUND.message.getUser });
     })
     .catch(() => res.status(INTERNAL_SERVER_ERROR.code)
       .send({ message: INTERNAL_SERVER_ERROR.message }));
@@ -44,11 +43,9 @@ export const createUser = (req: Request, res: Response) => {
 
 export const updateUser = (req: IUserRequest, res: Response) => {
   User.findByIdAndUpdate(req.user?._id, { name: req.body.name, about: req.body.about })
-    .orFail(() => new NotFoundError(NOT_FOUND.message.getUser))
-    .then((user) => res.status(CREATED.code).send(user))
     .then((user) => {
       if (user) {
-        res.status(DONE.code).send({ data: user });
+        return res.status(DONE.code).send(user);
       }
       return res.status(NOT_FOUND.code).send({ message: NOT_FOUND.message.updateUserInfo });
     })
@@ -63,11 +60,9 @@ export const updateUser = (req: IUserRequest, res: Response) => {
 
 export const updateUserAvatar = (req: IUserRequest, res: Response) => {
   User.findByIdAndUpdate(req.user?._id, { avatar: req.body.avatar })
-    .orFail(() => new NotFoundError(NOT_FOUND.message.getUser))
-    .then((user) => res.status(201).send(user))
     .then((user) => {
       if (user) {
-        res.status(DONE.code).send({ data: user });
+        return res.status(DONE.code).send(user);
       }
       return res.status(NOT_FOUND.code).send({ message: NOT_FOUND.message });
     })
