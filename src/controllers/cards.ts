@@ -1,10 +1,9 @@
 import { Request, Response } from 'express';
-import mongoose from 'mongoose';
 import { ICardRequest } from '../utils/types';
 import Card from '../models/card';
-import { VALIDATION_ERROR } from '../utils/const';
+import { VALIDATION_ERROR, CAST_ERROR } from '../utils/const';
 import {
-  BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER_ERROR, DONE,
+  BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER_ERROR, DONE, FORBIDDEN,
 } from '../utils/errors';
 
 // Нашли все карточки по схеме Card
@@ -33,12 +32,19 @@ export const deleteCard = (req: ICardRequest, res: Response) => {
   Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
       if (card && card.owner.toString() === req.user?._id) {
-        res.status(DONE.code).send(DONE.message.deleteCard);
+        return res.status(DONE.code).send(DONE.message.deleteCard);
+      } if (card?.owner.toString() !== req.user?._id) {
+        return res.status(FORBIDDEN.code).send({ message: FORBIDDEN.message.card });
       }
       return res.status(NOT_FOUND.code).send({ message: NOT_FOUND.message.cardDelete });
     })
-    .catch(() => res.status(INTERNAL_SERVER_ERROR.code)
-      .send({ message: INTERNAL_SERVER_ERROR.message }));
+    .catch((err) => {
+      if (err.name === CAST_ERROR) {
+        return res.status(BAD_REQUEST.code).send({ message: BAD_REQUEST.message.cardDelete });
+      }
+      return res.status(INTERNAL_SERVER_ERROR.code)
+        .send({ message: INTERNAL_SERVER_ERROR.message });
+    });
 };
 
 export const putCardLike = (req: ICardRequest, res: Response) => {
@@ -58,8 +64,8 @@ export const putCardLike = (req: ICardRequest, res: Response) => {
       return res.status(NOT_FOUND.code).send({ message: NOT_FOUND.message.actionLikeCard });
     })
     .catch((err) => {
-      if (err instanceof mongoose.Error.ValidationError) {
-        return res.status(BAD_REQUEST.code).send({ message: BAD_REQUEST.message.actionLikeCard });
+      if (err.name === CAST_ERROR) {
+        return res.status(BAD_REQUEST.code).send({ message: BAD_REQUEST.message.cardDelete });
       }
       return res.status(INTERNAL_SERVER_ERROR.code)
         .send({ message: INTERNAL_SERVER_ERROR.message });
@@ -84,8 +90,8 @@ export const deleteCardLike = (req: ICardRequest, res: Response) => {
       return res.status(NOT_FOUND.code).send({ message: NOT_FOUND.message.actionLikeCard });
     })
     .catch((err) => {
-      if (err instanceof mongoose.Error.ValidationError) {
-        return res.status(BAD_REQUEST.code).send({ message: BAD_REQUEST.message.actionLikeCard });
+      if (err.name === CAST_ERROR) {
+        return res.status(BAD_REQUEST.code).send({ message: BAD_REQUEST.message.cardDelete });
       }
       return res.status(INTERNAL_SERVER_ERROR.code)
         .send({ message: INTERNAL_SERVER_ERROR.message });

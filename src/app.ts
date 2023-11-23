@@ -20,6 +20,11 @@ app.use((req: IUserRequest, res, next) => { // Мидлвар добавляющ
 app.use(userRouter);
 app.use(cardRouter);
 
+// Обработка несуществующих роутов
+app.use((req, res) => {
+  res.status(404).render('404');
+});
+
 mongoose.connect(DEFAULT_DB_URL) // подключаемся к серверу MongoDB
   .then(() => console.log('Connected to mestodb'))
   .catch((err) => console.error('Error DB:', err.message));

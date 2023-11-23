@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { IUserRequest } from '../utils/types';
 import User from '../models/user';
-import { VALIDATION_ERROR } from '../utils/const';
+import { VALIDATION_ERROR, CAST_ERROR } from '../utils/const';
 import {
   BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER_ERROR, CREATED, DONE,
 } from '../utils/errors';
@@ -21,8 +21,13 @@ export const getUserById = (req: IUserRequest, res: Response) => {
       }
       return res.status(NOT_FOUND.code).send({ message: NOT_FOUND.message.getUser });
     })
-    .catch(() => res.status(INTERNAL_SERVER_ERROR.code)
-      .send({ message: INTERNAL_SERVER_ERROR.message }));
+    .catch((err) => {
+      if (err.name === CAST_ERROR) {
+        return res.status(BAD_REQUEST.code).send({ message: BAD_REQUEST.message.cardDelete });
+      }
+      return res.status(INTERNAL_SERVER_ERROR.code)
+        .send({ message: INTERNAL_SERVER_ERROR.message });
+    });
 };
 
 export const createUser = (req: Request, res: Response) => {
@@ -42,7 +47,11 @@ export const createUser = (req: Request, res: Response) => {
 };
 
 export const updateUser = (req: IUserRequest, res: Response) => {
-  User.findByIdAndUpdate(req.user?._id, { name: req.body.name, about: req.body.about })
+  User.findByIdAndUpdate(
+    req.user?._id,
+    { name: req.body.name, about: req.body.about },
+    { new: true, runValidators: true },
+  )
     .then((user) => {
       if (user) {
         return res.status(DONE.code).send(user);
@@ -59,7 +68,11 @@ export const updateUser = (req: IUserRequest, res: Response) => {
 };
 
 export const updateUserAvatar = (req: IUserRequest, res: Response) => {
-  User.findByIdAndUpdate(req.user?._id, { avatar: req.body.avatar })
+  User.findByIdAndUpdate(
+    req.user?._id,
+    { avatar: req.body.avatar },
+    { new: true, runValidators: true },
+  )
     .then((user) => {
       if (user) {
         return res.status(DONE.code).send(user);
