@@ -23,7 +23,7 @@ app.use(cardRouter);
 
 // Обработка несуществующих роутов
 app.use((req, res) => {
-  res.status(NOT_FOUND.code).send({message: NOT_FOUND.message.getPage});
+  res.status(NOT_FOUND.code).send({ message: NOT_FOUND.message.getPage });
 });
 
 mongoose.connect(DEFAULT_DB_URL) // подключаемся к серверу MongoDB

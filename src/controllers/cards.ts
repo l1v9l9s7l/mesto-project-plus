@@ -31,10 +31,10 @@ export const createCard = (req: ICardRequest, res: Response) => {
 export const deleteCard = (req: ICardRequest, res: Response) => {
   Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
-      if(!card){
+      if (!card) {
         return res.status(NOT_FOUND.code).send({ message: NOT_FOUND.message.cardDelete });
       }
-      if(card.owner.toString() !== req.user?._id){
+      if (card.owner.toString() !== req.user?._id) {
         return res.status(FORBIDDEN.code).send({ message: FORBIDDEN.message.card });
       }
       return res.status(DONE.code).send(DONE.message.deleteCard);

@@ -46,7 +46,7 @@ export const NOT_FOUND = {
     updateUserInfo: 'Переданы некорректные данные при обновлении профиля.',
     cardDelete: 'Карточка с указанным _id не найдена.',
     actionLikeCard: 'Передан несуществующий _id карточки.',
-    getPage: 'Page not found'
+    getPage: 'Page not found',
   },
 };
 
