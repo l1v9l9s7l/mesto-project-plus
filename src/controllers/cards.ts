@@ -33,7 +33,7 @@ export const deleteCard = (req: ICardRequest, res: Response) => {
     .then((card) => {
       if (card && card.owner.toString() === req.user?._id) {
         return res.status(DONE.code).send(DONE.message.deleteCard);
-      } if (card?.owner.toString() !== req.user?._id) {
+      } if (card && card.owner.toString() !== req.user?._id) {
         return res.status(FORBIDDEN.code).send({ message: FORBIDDEN.message.card });
       }
       return res.status(NOT_FOUND.code).send({ message: NOT_FOUND.message.cardDelete });
