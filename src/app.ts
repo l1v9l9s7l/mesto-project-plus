@@ -4,6 +4,7 @@ import userRouter from './routes/user';
 import cardRouter from './routes/card';
 import { IUserRequest } from './utils/types';
 import { DEFAULT_DB_URL } from './utils/const';
+import { NOT_FOUND } from './utils/errors';
 
 const { PORT = 3000 } = process.env;
 const app = express(); // создаем приложение методом экспресс
@@ -22,7 +23,7 @@ app.use(cardRouter);
 
 // Обработка несуществующих роутов
 app.use((req, res) => {
-  res.status(404).render('404');
+  res.status(NOT_FOUND.code).send({message: NOT_FOUND.message.getPage});
 });
 
 mongoose.connect(DEFAULT_DB_URL) // подключаемся к серверу MongoDB
