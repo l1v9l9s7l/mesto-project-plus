@@ -1,18 +1,20 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
+import ForbiddenError from '../errors/ForbiddenError';
 import { ICardRequest } from '../utils/types';
 import Card from '../models/card';
 import { VALIDATION_ERROR, CAST_ERROR } from '../utils/const';
 import {
-  BAD_REQUEST, NOT_FOUND, INTERNAL_SERVER_ERROR, DONE, FORBIDDEN,
+  BAD_REQUEST, NOT_FOUND, DONE, FORBIDDEN,
 } from '../utils/errors';
+import NotFoundError from '../errors/NotFoundError';
+import BadRequestError from '../errors/BadRequestError';
 
 // Нашли все карточки по схеме Card
-export const getCards = (req: Request, res: Response) => Card.find({})
+export const getCards = (req: Request, res: Response, next: NextFunction) => Card.find({})
   .then((cards) => { res.status(200).send({ data: cards }); }) // Отправляем данные карточек
-  .catch(() => res.status(INTERNAL_SERVER_ERROR.code)
-    .send({ message: INTERNAL_SERVER_ERROR.message }));
+  .catch(next);
 
-export const createCard = (req: ICardRequest, res: Response) => {
+export const createCard = (req: ICardRequest, res: Response, next: NextFunction) => {
   Card.create({
     name: req.body.name,
     link: req.body.link,
@@ -21,34 +23,34 @@ export const createCard = (req: ICardRequest, res: Response) => {
     .then((card) => res.status(201).send(card))
     .catch((err) => {
       if (err.name === VALIDATION_ERROR) {
-        return res.status(BAD_REQUEST.code).send({ message: BAD_REQUEST.message.cardCreate });
+        next(new BadRequestError(BAD_REQUEST.message.cardCreate));
+      } else {
+        next(err);
       }
-      return res.status(INTERNAL_SERVER_ERROR.code)
-        .send({ message: INTERNAL_SERVER_ERROR.message });
     });
 };
 
-export const deleteCard = (req: ICardRequest, res: Response) => {
+export const deleteCard = (req: ICardRequest, res: Response, next: NextFunction) => {
   Card.findByIdAndRemove(req.params.cardId)
     .then((card) => {
       if (!card) {
-        return res.status(NOT_FOUND.code).send({ message: NOT_FOUND.message.cardDelete });
+        throw new NotFoundError(NOT_FOUND.message.cardDelete);
       }
       if (card.owner.toString() !== req.user?._id) {
-        return res.status(FORBIDDEN.code).send({ message: FORBIDDEN.message.card });
+        throw new ForbiddenError(FORBIDDEN.message.card);
       }
       return res.status(DONE.code).send(DONE.message.deleteCard);
     })
     .catch((err) => {
       if (err.name === CAST_ERROR) {
-        return res.status(BAD_REQUEST.code).send({ message: BAD_REQUEST.message.cardDelete });
+        next(new BadRequestError(err.message));
+      } else {
+        next(err);
       }
-      return res.status(INTERNAL_SERVER_ERROR.code)
-        .send({ message: INTERNAL_SERVER_ERROR.message });
     });
 };
 
-export const putCardLike = (req: ICardRequest, res: Response) => {
+export const putCardLike = (req: ICardRequest, res: Response, next: NextFunction) => {
   const id = req.params.cardId;
   const owner = req.user?._id;
   Card.findByIdAndUpdate(
@@ -62,18 +64,18 @@ export const putCardLike = (req: ICardRequest, res: Response) => {
       if (card) {
         return res.status(DONE.code).send({ data: card });
       }
-      return res.status(NOT_FOUND.code).send({ message: NOT_FOUND.message.actionLikeCard });
+      throw new NotFoundError(NOT_FOUND.message.actionLikeCard);
     })
     .catch((err) => {
       if (err.name === CAST_ERROR) {
-        return res.status(BAD_REQUEST.code).send({ message: BAD_REQUEST.message.cardDelete });
+        next(new BadRequestError(BAD_REQUEST.message.actionLikeCard));
+      } else {
+        next(err);
       }
-      return res.status(INTERNAL_SERVER_ERROR.code)
-        .send({ message: INTERNAL_SERVER_ERROR.message });
     });
 };
 
-export const deleteCardLike = (req: ICardRequest, res: Response) => {
+export const deleteCardLike = (req: ICardRequest, res: Response, next: NextFunction) => {
   const id = req.params.cardId;
   const owner = req.user?._id;
   Card.findByIdAndUpdate(
@@ -88,13 +90,13 @@ export const deleteCardLike = (req: ICardRequest, res: Response) => {
       if (card) {
         return res.status(DONE.code).send({ data: card });
       }
-      return res.status(NOT_FOUND.code).send({ message: NOT_FOUND.message.actionLikeCard });
+      throw new NotFoundError(NOT_FOUND.message.actionLikeCard);
     })
     .catch((err) => {
       if (err.name === CAST_ERROR) {
-        return res.status(BAD_REQUEST.code).send({ message: BAD_REQUEST.message.cardDelete });
+        next(new BadRequestError(BAD_REQUEST.message.actionLikeCard));
+      } else {
+        next(err);
       }
-      return res.status(INTERNAL_SERVER_ERROR.code)
-        .send({ message: INTERNAL_SERVER_ERROR.message });
     });
 };

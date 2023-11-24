@@ -3,6 +3,8 @@ import { Request } from 'express';
 
 export type TUser = {
   name: string,
+  email: string,
+  password: string,
   about: string,
   avatar: string
 }
@@ -25,4 +27,9 @@ export interface ICardRequest extends Request {
   user?: {
     _id: string
   }
+}
+
+export interface IError extends Error {
+  statusCode: number;
+  code?: number;
 }
