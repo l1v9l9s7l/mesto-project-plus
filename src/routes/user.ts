@@ -3,7 +3,7 @@ import {
   updateUser, updateUserAvatar, getUsers, getUserById, getUserMe,
 } from '../controllers/users';
 
-import { getUserByIdValidation, updateUserProfileValidation, updateUserAvatarValidation } from '../validators/userValidators';
+import { updateUserAvatarValidation, updateUserProfileValidation, getUserByIdValidation } from '../validators/userValidators';
 
 const userRouter = Router();
 

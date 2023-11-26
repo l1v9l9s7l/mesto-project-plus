@@ -20,7 +20,6 @@ export const createCardValidation = celebrate({
 export const getCardByIdValidation = celebrate({
   params: Joi.object().keys({
     id: Joi.string().required()
-      .message('Некорректный id')
       .messages({
         'string.empty': 'Поле id должно быть заполнено',
       }),
